@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJAP0g2VrEsYsI2L0zI1zjZcZapDtgcCA"></script>
+  <script>src="https://maps.googleapis.com/maps/api/js?key=%GOOGLE_MAPS_API_KEY%&callback=initMap"</script>
   <title>MedConnect</title>
   <meta name="description" content="MedConnect – pretraga privatnih medicinskih ordinacija u BiH po gradovima. Kontaktiraj ordinacije i pronađi uslugu koju tražiš." />
   <style>
@@ -638,6 +638,17 @@
 
  
     <script>
+      require('dotenv').config();
+
+const express = require('express');
+const app = express();
+
+app.get('/api-key', (req, res) => {
+  res.json({ key: process.env.GOOGLE_MAPS_API_KEY });
+});
+
+app.listen(3000);
+
      let PREMIUM_IDS = [];
 
 function pickPremium(list) {
