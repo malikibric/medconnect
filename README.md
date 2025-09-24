@@ -1,5 +1,5 @@
 MedConnect
-  ![Alt tekst](pict1.png)
+  ![Alt tekst](pict2.png)
 
 MedConnect is a web application designed to help patients easily find and connect with healthcare providers, clinics, and pharmacies. Through an interactive map and intuitive interface, users can:
 
@@ -12,7 +12,7 @@ Access key details such as address, contact info, and working hours
 Quickly navigate to the desired location
 
 The goal of this project is to digitize and modernize access to healthcare services.
-![Alt tekst](pict2.png)
+![Alt tekst](pict1.png)
 
 Technologies
 
