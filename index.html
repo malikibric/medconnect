@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJAP0g2VrEsYsI2L0zI1zjZcZapDtgcCA"></script>
+  <title>MedConnect</title>
+  <meta name="description" content="MedConnect – pretraga privatnih medicinskih ordinacija u BiH po gradovima. Kontaktiraj ordinacije i pronađi uslugu koju tražiš." />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --surface: #0f172a;
+      --muted: #1e293b;
+      --card: #111827;
+      --text: #e5e7eb;
+      --text-dim: #94a3b8;
+      --primary: #22d3ee; /* cyan-400 */
+      --primary-strong: #06b6d4; /* cyan-500 */
+      --ring: rgba(34, 211, 238, 0.35);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --shadow-lg: 0 20px 50px rgba(0,0,0,.45);
+      --shadow-md: 0 10px 25px rgba(0,0,0,.35);
+      --shadow-sm: 0 6px 14px rgba(0,0,0,.28);
+      --maxw: 1200px;
+    }
+    .item.premium {
+  border: 2px solid gold;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+  position: relative;
+}
+
+.item.premium::before {
+  content: "PREMIUM";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: gold;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(34,211,238,.12), transparent 40%),
+                  radial-gradient(800px 500px at 90% 30%, rgba(99,102,241,.10), transparent 40%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-strong); }
+
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+    .container.grid {
+  margin-top: 35px; /* pomjeri mapu i kartice dole */
+}
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.75);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between; height: 90px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 65px; height: 65px; display: grid; place-items: center;
+      color: #001018; font-weight: 800; border-radius: 16px; box-shadow: var(--shadow-sm);
+    }
+    .brand h1 { font-size: 40px; margin: 0; letter-spacing: .7px; }
+
+    .nav a.btn { padding: 10px 16px; border-radius: 12px; background: var(--muted); color: var(--text);
+      border: 1px solid rgba(255,255,255,.06); transition: .2s ease; font-weight: 600; }
+    .nav a.btn:hover { transform: translateY(-1px); border-color: var(--primary); box-shadow: 0 0 0 6px var(--ring); }
+      .nav-toggle {
+  display: none;
+  font-size: 28px;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .nav a.btn {
+    display: none; /* sakrij linkove */
+  }
+  .nav-toggle {
+    display: block; /* prikaži hamburger dugme */
+  }
+  .nav.open a.btn {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+  }
+}
+
+    /* Hero */
+.hero {
+  min-height: 80vh; 
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  background: radial-gradient(1200px 600px at 10% 20%, rgba(34,211,238,.12), transparent 40%),
+              radial-gradient(800px 500px at 90% 0%, rgba(99,102,241,.10), transparent 40%),
+              #0b1220; 
+  text-align: center;
+  padding: 0 5%; /* uvijek 5% razmaka s lijeve i desne strane */
+  box-sizing: border-box;
+}
+
+.hero-content {
+  max-width: 800px; /* ograniči širinu teksta */
+  width: 100%;
+}
+
+.hero-content .title {
+  font-size: clamp(36px, 6vw, 64px); /* font se skalira responsivno */
+  font-weight: 800;
+  color: #e5e7eb;
+  margin: 0 0 12px;
+}
+
+.hero-content .subtitle {
+  font-size: clamp(18px, 3vw, 24px); /* font responsivan */
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+
+    .title { font-size: clamp(28px, 4vw, 44px); line-height: 1.12; margin: 0 0 10px; }
+    .subtitle { color: var(--text-dim); margin: 0 0 28px; max-width: 60ch; }
+
+ .search-panel {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--radius-xl);
+  padding: 24px;           /* više paddinga unutra */
+  box-shadow: var(--shadow-lg); /* jači shadow */
+  max-width: 700px;        /* veća maksimalna širina */
+  margin: 20px auto;       /* centriranje i razmak odozdo i odozgo */
+  font-size: 1.05rem;      /* lagano veći font za tekst */
+  transition: transform 0.2s ease;
+}
+
+/* Opcionalno: blagi hover efekt da panel "iskače" */
+.search-panel:hover {
+  transform: scale(1.02);
+}
+
+    .fields { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; }
+    .field { position: relative; }
+    label { position: absolute; top: 8px; left: 12px; font-size: 12px; color: var(--text-dim); }
+    input, select, button {
+      width: 100%; padding: 26px 14px 10px; background: var(--card); color: var(--text);
+      border: 1px solid rgba(255,255,255,.06); border-radius: 12px; outline: none; transition: .2s ease;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 6px var(--ring); }
+    .btn-primary { cursor: pointer; padding: 14px 18px; background: linear-gradient(135deg, var(--primary), #60a5fa);
+      font-weight: 700; border: none; color: #0a1220; box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+    .hero-card { background: linear-gradient(180deg, rgba(34,211,238,.08), transparent 60%), var(--surface);
+      border: 1px solid rgba(255,255,255,.08); padding: 18px; border-radius: var(--radius-xl); box-shadow: var(--shadow-md);
+    }
+
+  .stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;                 /* malo više razmaka između kartica */
+  margin: 40px auto 0;       /* centrirano, sa razmakom odozgo */
+  max-width: 900px;           /* ograniči širinu da ne bude do kraja ekrana */
+  width: 90%;                /* popunjava većinu širine ekrana */
+}
+
+.stat {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,.06);
+  padding: 30px 20px;        /* veći padding za vizualni naglasak */
+  border-radius: 20px;       /* malo veće za moderniji look */
+  text-align: center;
+  box-shadow: var(--shadow-lg); /* vizualni "lift" */
+  transition: transform 0.2s ease;
+}
+
+.stat:hover {
+  transform: translateY(-4px);  /* blagi hover efekt */
+}
+
+.stat .num {
+  font-size: 28px;           /* veći broj */
+  font-weight: 800;
+}
+
+.stat .lbl {
+  font-size: 14px;           /* veća oznaka */
+  color: var(--text-dim);
+}
+
+
+    /* Map + list */
+    .section { padding: 28px 0 10px; }
+    .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: start; }
+    .panel { background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); overflow: hidden; }
+    
+    .map { height: 420px; position: relative; }
+    .map .placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-dim);
+      background: linear-gradient(160deg, rgba(34,211,238,.07), rgba(99,102,241,.06)); }
+    .map .placeholder svg { opacity: .9; }
+
+    .list {
+  max-height: 420px; 
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+}
+
+.item .badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #001018;
+  background: var(--primary);
+  align-self: flex-start;
+}
+
+.item h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.item p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.item .cta {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ghost {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ghost:hover {
+  border-color: var(--primary-strong);
+  background: rgba(34,211,238,0.1);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Popup sadržaj */
+/* Glavni popup container */
+/* InfoWindow container */
+.gm-style .custom-infowindow {
+  max-width: 240px;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #dce6f5; /* svijetlo siva za tekst */
+  padding: 12px 16px;
+  background: #0d1b2a; /* tamno plava pozadina */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Naslov */
+.gm-style .custom-infowindow b {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4da3ff; /* svjetlija plava */
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Tekst */
+.gm-style .custom-infowindow p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #a9bbd9; /* sivo-plava za sekundarni tekst */
+  white-space: normal;
+}
+
+
+
+
+    /* Contact */
+    
+    form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    form textarea { min-height: 120px; resize: vertical; padding-top: 28px; }
+    form button { margin-top: 8px; }
+
+    footer { margin-top: 30px; padding: 28px 0 40px; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,.06); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid, .grid, .contact { grid-template-columns: 1fr; }
+      .fields { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr 1fr; }
+      .map { height: 360px; }
+    }
+    @media (max-width: 560px){
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .nav a.btn { display: none; }
+    }
+    @media (min-width: 1200px) {
+  .hero-content .title {
+    font-size: 72px; /* fiksno za velike ekrane */
+  }
+  .hero-content .subtitle {
+    font-size: 32px;
+  }
+}
+.stars {
+  display: flex;
+  gap: 4px;        /* malo veći razmak između zvjezdica */
+  margin: 4px 0;
+  font-size: 24px; /* povećano sa 14px na 24px */
+  color: #facc15;  /* zlatna boja */
+}
+
+
+
+    /* Sekcija "Zašto izabrati MedConnect" */
+/* Sekcija "Zašto izabrati MedConnect" */
+.why-section {
+  padding: 60px 20px;
+  
+  text-align: center;
+}
+
+.why-section h2 {
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  color:white ;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.why-card {
+  
+  border-radius: 12px;
+  padding: 25px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.why-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.why-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color:white;
+}
+
+.why-card p {
+  font-size: 0.95rem;
+  color: #a7a5a5;
+  line-height: 1.5;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .why-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  .why-card {
+    padding: 20px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .why-section h2 {
+    font-size: 1.6rem;
+  }
+  .why-card h3 {
+    font-size: 1.1rem;
+  }
+  .why-card p {
+    font-size: 0.9rem;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+
+        <img src="Medconnect.png" alt="Logo kompanije" class="logo">
+        <h1>MedConnect</h1>
+      </div>
+      <button class="nav-toggle" aria-label="Otvori meni">
+         &#9776;
+    </button>
+      <nav>
+        <a class="btn" href="#početna">Početna</a>
+        <a class="btn" href="#onama">O nama</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+  <div class="hero-content">
+    <h2 class="title">Prva i najveća mreža privatnih medicinskih ustanova u BiH</h2>
+    <p class="subtitle">Jednostavno. Sigurno. Povezano.</p>
+  </div>
+</section>
+<section class="search-panel" role="search">
+  
+    <div class="field">
+    <label for="lokacija">Odaberite lokaciju: <span id="odabrano"></span></label>
+    <select id="lokacija">
+    <option value="">Svi</option>
+    <option value="fbih" style="color:#555;" disabled>Federacija BiH</option>
+<option value="unsko-sanski">Unsko-sanski kanton</option>
+<option value="posavski">Posavski kanton</option>
+<option value="tuzlanski">Tuzlanski kanton</option>
+<option value="zenicko-dobojski">Zeničko-dobojski kanton</option>
+<option value="bosnjacko-podrinjski">Bosansko-podrinjski kanton Goražde</option>
+<option value="srednjobosanski">Srednjobosanski kanton</option>
+<option value="hercegovacko-neretvanski">Hercegovačko-neretvanski kanton</option>
+<option value="zapadnohercegovacki">Zapadnohercegovački kanton</option>
+<option value="sarajevski">Kanton Sarajevo</option>
+<option value="kanton10">Kanton 10</option>
+
+  <option value="rs" style="color:#555;" disabled>Republika Srpska</option>
+
+<option value="banjalucka">Banjalučka</option>
+<option value="dobojska">Dobojsko-Bijeljinska</option>
+<option value="bijeljinska">Bijeljinska regija</option>
+<option value="sarajevsko-romanijska">Sarajevsko-zvornička</option>
+<option value="trebinjska">Trebinjsko-Fočanska</option>
+
+<option value="brckobih" style="color:#555;" disabled>Brčko distrikt BiH</option>
+<option value="76100">Brčko distrikt BiH</option>
+
+</select>
+</div>
+<div class="field"></div>
+    <div class="field">
+      <label for="tip">Kategorija</label>
+      <select id="tip" aria-label="Odaberite tip ordinacije">
+        <option value="">Sve vrste</option>
+        <option>Estetska medicina i plastična hirurgija</option>
+<option>Fizikalna terapija i rehabilitacija</option>
+<option>Opća medicina</option>
+<option>Psihološke i psihijatrijske usluge</option>
+<option>Specijalističke ordinacije</option>
+<option>Stomatologija</option>
+<option>Centri za fertilitet (IVF)</option>
+        <!-- Add other types -->
+      </select>
+    </div>
+    <button class="btn-primary" id="btnPretraga" aria-label="Filtriraj rezultate">Prikaži</button>
+  </div>
+</div>
+</section>
+        <div class="stat-row">
+          <div class="stat"><div class="num" data-target="500">0</div><div class="lbl">Ustanova</div></div>
+          <div class="stat"><div class="num" data-target="100" >0</div><div class="lbl">Lokacija</div></div>
+          <div class="stat"><div class="num"  data-target="20">0</div><div class="lbl">Tipova usluga</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <div class="container grid">
+  <!-- Mapa -->
+  <div class="panel map">
+    <div id="leafletmap" style="height:100%; width:100%;"></div>
+  </div>
+
+  <!-- Lista ordinacija -->
+  <div class="panel list" id="lista">
+    <!-- JS će ovdje renderirati kartice -->
+  </div>
+</div>
+
+
+     
+
+      
+    </div>
+  </section>
+
+
+<section id="why" class="why-section">
+  <h2>Zašto izabrati MedConnect?</h2>
+  <div class="why-grid">
+    <div class="why-card">
+      <h3>Pouzdane informacije</h3>
+      <p>Svi podaci o ordinacijama su provjereni i redovno ažurirani.</p>
+    </div>
+    <div class="why-card">
+      <h3>Brza pretraga</h3>
+      <p>Pronađite najbližu privatnu zdravstvenu ustanovu u par klikova.</p>
+    </div>
+    <div class="why-card">
+      <h3>Raznolikost usluga</h3>
+      <p>Od stomatologije do laboratorijskih pretraga, sve na jednom mjestu.</p>
+    </div>
+    <div class="why-card">
+      <h3>Za ustanove</h3>
+      <p>Budite dio najveće mreže u BiH, istaknite svoj rad i kvalitet.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- O nama ispod -->
+<section id="onama" class="section">
+  <div class="container about">
+    <h2 style="margin:0 0 12px;">O nama</h2>
+    <p class="subtitle" style="margin:0;">
+      <strong>MedConnect</strong> je prva i najveća online mreža privatnih medicinskih ustanova u Bosni i Hercegovini. 
+      Naša misija je olakšati građanima pristup zdravstvenim uslugama – jednostavno, sigurno i brzo. 
+      Povezujemo pacijente sa provjerenim ordinacijama i klinikama, bez komplikacija.
+    </p>
+
+    <!-- Social media ikone -->
+    <div class="social-media">
+      <h3>Pratite nas</h3>
+      <div class="social-links">
+        <a href="https://www.instagram.com/tvoja_stranica" target="_blank">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+        </a>
+        <a href="https://www.tiktok.com/@tvoja_stranica" target="_blank">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
+        </a>
+        <a href="https://www.facebook.com/tvoja_stranica" target="_blank">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+
+
+.social-media {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.social-media h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.social-links a img {
+  width: 28px;
+  height: 28px;
+  filter: invert(100%); /* ikone bijele da se uklapaju */
+  transition: transform 0.25s ease;
+}
+
+.social-links a:hover img {
+  transform: scale(1.2);
+}
+</style>
+
+<footer>
+  <div class="container" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:6px;">
+    <div>© <span id="year"></span> MedConnect. Sva prava zadržana.</div>
+  </div>
+
+</footer>
+
+
+ 
+    <script>
+     let PREMIUM_IDS = [];
+
+function pickPremium(list) {
+  if (list.length <= 3) {
+    PREMIUM_IDS = list.map(o => o.id);
+  } else {
+    const shuffled = [...list].sort(() => 0.5 - Math.random());
+    PREMIUM_IDS = shuffled.slice(0, 3).map(o => o.id);
+  }
+}
+
+
+const gradovi = {
+  sarajevski: [
+    { ime: "Sarajevo", postanski: "71000" },
+    { ime: "Ilidža", postanski: "71210" },
+    { ime: "Hadžići", postanski: "71330" },
+    { ime: "Ilijaš", postanski: "71350" },
+    { ime: "Novi Grad", postanski: "71000" },
+    { ime: "Novo Sarajevo", postanski: "71000" },
+    { ime: "Stari Grad", postanski: "71000" },
+    { ime: "Vogošća", postanski: "71320" },
+    { ime: "Trnovo", postanski: "71370" }
+  ],
+  zenicko_dobojski: [
+    { ime: "Zenica", postanski: "72000" },
+    { ime: "Tešanj", postanski: "74210" },
+    { ime: "Visoko", postanski: "71300" },
+    { ime: "Kakanj", postanski: "72240" },
+    { ime: "Zavidovići", postanski: "72220" },
+    { ime: "Žepče", postanski: "72230" },
+    { ime: "Maglaj", postanski: "74250" },
+    { ime: "Breza", postanski: "71370" },
+    { ime: "Olovo", postanski: "71350" },
+    { ime: "Vareš", postanski: "71380" },
+    { ime: "Usora", postanski: "74260" },
+    { ime: "Doboj Jug", postanski: "74270" }
+  ],
+  tuzlanski: [
+    { ime: "Tuzla", postanski: "75000" },
+    { ime: "Banovići", postanski: "75290" },
+    { ime: "Lukavac", postanski: "75300" },
+    { ime: "Gračanica", postanski: "75350" },
+    { ime: "Kalesija", postanski: "75260" },
+    { ime: "Srebrenik", postanski: "75300" },
+    { ime: "Živinice", postanski: "75270" },
+    { ime: "Sapna", postanski: "75411" },
+    { ime: "Teočak", postanski: "75280" },
+    { ime: "Čelić", postanski: "75250" },
+    { ime: "Doboj Istok", postanski: "75240" },
+    { ime: "Kladanj", postanski: "75290" },
+    { ime: "Doboj Jug", postanski: "74270" }
+  ],
+  unsko_sanski: [
+    { ime: "Bihać", postanski: "77000" },
+    { ime: "Cazin", postanski: "77200" },
+    { ime: "Sanski Most", postanski: "77300" },
+    { ime: "Velika Kladuša", postanski: "77400" },
+    { ime: "Bosanska Krupa", postanski: "77500" },
+    { ime: "Bužim", postanski: "77600" },
+    { ime: "Ključ", postanski: "77700" },
+    { ime: "Bosanski Petrovac", postanski: "77800" }
+  ],
+  hercegovacko_neretvanski: [
+    { ime: "Mostar", postanski: "88000" },
+    { ime: "Čapljina", postanski: "88300" },
+    { ime: "Konjic", postanski: "88400" },
+    { ime: "Jablanica", postanski: "88500" },
+    { ime: "Prozor-Rama", postanski: "88600" },
+    { ime: "Neum", postanski: "88390" },
+    { ime: "Stolac", postanski: "88360" },
+    { ime: "Čitluk", postanski: "88350" },
+    { ime: "Nevesinje", postanski: "88310" },
+    { ime: "Ravno", postanski: "88320" }
+  ],
+  srednjobosanski: [
+    { ime: "Travnik", postanski: "72270" },
+    { ime: "Novi Travnik", postanski: "72290" },
+    { ime: "Vitez", postanski: "72260" },
+    { ime: "Busovača", postanski: "72250" },
+    { ime: "Kiseljak", postanski: "71250" },
+    { ime: "Kreševo", postanski: "71260" },
+    { ime: "Fojnica", postanski: "71270" },
+    { ime: "Jajce", postanski: "70250" },
+    { ime: "Gornji Vakuf-Uskoplje", postanski: "70240" },
+    { ime: "Donji Vakuf", postanski: "70220" },
+    { ime: "Dobretići", postanski: "70230" }
+  ],
+  zapadnohercegovacki: [
+    { ime: "Široki Brijeg", postanski: "88220" },
+    { ime: "Ljubuški", postanski: "88310" },
+    { ime: "Grude", postanski: "88330" },
+    { ime: "Posušje", postanski: "88340" }
+  ],
+  posavski: [
+    { ime: "Orašje", postanski: "76270" },
+    { ime: "Domaljevac-Šamac", postanski: "76290" },
+    { ime: "Odžak", postanski: "76250" }
+  ],
+  kanton10: [
+    { ime: "Livno", postanski: "80101" },
+    { ime: "Tomislavgrad", postanski: "80240" },
+    { ime: "Kupres", postanski: "80300" },
+    { ime: "Glamoč", postanski: "80400" },
+    { ime: "Drvar", postanski: "80500" },
+    { ime: "Bosansko Grahovo", postanski: "80600" }
+  ],
+  bosnjacko_podrinjski: [
+    { ime: "Goražde", postanski: "73000" },
+    { ime: "Foča-Ustikolina", postanski: "73250" },
+    { ime: "Pale-Prača", postanski: "73260" }
+  ],
+  banjalucka: [
+    { ime: "Banja Luka", postanski: "78000" },
+    { ime: "Gradiška", postanski: "78400" },
+    { ime: "Laktaši", postanski: "78250" },
+    { ime: "Kozarska Dubica", postanski: "78300" },
+    { ime: "Prijedor", postanski: "79101" },
+    { ime: "Kotor Varoš", postanski: "78410" },
+    { ime: "Čelinac", postanski: "78200" },
+    { ime: "Srbac", postanski: "78420" },
+    { ime: "Mrkonjić Grad", postanski: "70250" },
+    { ime: "Šipovo", postanski: "70270" },
+    { ime: "Ribnik", postanski: "70280" },
+    { ime: "Kneževo", postanski: "70290" },
+    { ime: "Novi Grad", postanski: "70240" },
+    { ime: "Kostajnica", postanski: "70260" },
+    { ime: "Oštra Luka", postanski: "70270" }
+  ],
+  dobojska: [
+    { ime: "Doboj", postanski: "74000" },
+    { ime: "Modriča", postanski: "74400" },
+    { ime: "Derventa", postanski: "74410" },
+    { ime: "Teslić", postanski: "74420" },
+    { ime: "Petrovo", postanski: "74430" },
+    { ime: "Šamac", postanski: "74440" },
+    { ime: "Brod", postanski: "74450" },
+    { ime: "Vukosavlje", postanski: "74460" }
+  ],
+  bijeljinska: [
+    { ime: "Bijeljina", postanski: "76300" },
+    { ime: "Ugljevik", postanski: "76310" },
+    { ime: "Lopare", postanski: "76320" }
+  ],
+  sarajevsko_romanijska: [
+    { ime: "Istočno Sarajevo", postanski: "71123" },
+    { ime: "Pale", postanski: "71120" },
+    { ime: "Sokolac", postanski: "71122" },
+    { ime: "Istočna Ilidža", postanski: "71121" },
+    { ime: "Istočno Novo Sarajevo", postanski: "71124" },
+    { ime: "Trnovo (RS)", postanski: "71125" },
+    { ime: "Rogatica", postanski: "71126" },
+    { ime: "Han Pijesak", postanski: "71127" },
+    { ime: "Zvornik", postanski: "71128" },
+    { ime: "Milići", postanski: "71129" },
+    { ime: "Vlasenica", postanski: "71130" },
+    { ime: "Šekovići", postanski: "71131" },
+    { ime: "Bratunac", postanski: "71132" },
+    { ime: "Srebrenica", postanski: "71133" }
+  ]
+  }
+ 
+
+
+const select = document.getElementById("lokacija");
+const odabranoLabel = document.getElementById("odabrano");
+// Funkcija za prikaz odabranog
+function prikaziOdabrano(text) {
+  odabranoLabel.textContent = text;
+}
+
+// Kad se promijeni izbor
+select.addEventListener("change", function () {
+  const odabrano = this.value;
+  const tekst = this.options[this.selectedIndex].textContent;
+
+  prikaziOdabrano(tekst);
+
+  // Ukloni prethodno dodane gradove
+  document.querySelectorAll(".gradovi-grupa").forEach(g => g.remove());
+
+  // Ako je kanton sa gradovima
+  if (gradovi[odabrano]) {
+    const group = document.createElement("optgroup");
+    group.label = "Gradovi";
+    group.classList.add("gradovi-grupa");
+
+    gradovi[odabrano].forEach(g => {
+      const opt = document.createElement("option");
+      opt.value = g.postanski; // poštanski broj
+      opt.textContent = `${g.ime} (${g.postanski})`;
+      group.appendChild(opt);
+    });
+
+    // Ubacivanje odmah ispod kantona
+    const kantonOption = [...select.options].find(opt => opt.value === odabrano);
+    select.insertBefore(group, select.options[kantonOption.index + 1]);
+  }
+});
+
+let ORD = []; // prazan niz
+const elTip = document.getElementById('tip');
+const elBtn = document.getElementById('btnPretraga');
+const elLista = document.getElementById('lista');
+const statUk = document.querySelector('.stat-row .num[data-target="100"]');
+const statTp = document.querySelector('.stat-row .num[data-target="10"]');
+
+// Funkcija za prikaz zvjezdica
+function renderStars(rating) {
+  let stars = '';
+  for (let i = 1; i <= 5; i++) {
+    if (rating >= i) stars += '★';
+    else if (rating >= i - 0.5) stars += '';
+    else stars += '☆';
+  }
+  return `<div class="stars" style="color:#facc15; font-size:14px;">${stars}</div>`;
+}
+
+// Inicijalizacija Google Maps
+let map;
+function initMap() {
+  map = new google.maps.Map(document.getElementById("leafletmap"), {
+    center: { lat: 44.123, lng: 17.78 },
+    zoom: 7.3,
+    clickableIcons: false,
+        mapTypeId: "hybrid", // odmah satelitski prikaz
+        disableDefaultUI: true, // uklanja sve dugmiće i kontrole
+        gestureHandling: "greedy", // dozvoljava pomjeranje mišem i touch
+styles: [
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+  }
+]
+
+  });
+}
+initMap();
+
+
+// Marker map za povezivanje sa karticama
+let markersGroup;
+const markerMap = new Map(); // id ordinacije -> marker
+
+// Render liste ordinacija sa povezivanjem na markere
+function render(list) {
+  elLista.innerHTML = '';
+  if (list.length === 0) {
+    elLista.innerHTML = `
+      <div class="item">
+        <div class="badge">0</div>
+        <div>
+          <h4>Nema rezultata</h4>
+          <p>Pokušajte drugačiji tip.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  list.forEach(o => {
+   const row = document.createElement('div');
+row.className = 'item';
+if (PREMIUM_IDS.includes(o.id)) {
+  row.classList.add('premium');
+}
+
+    row.dataset.id = o.id; // ključ za marker
+    row.innerHTML = `
+      <div class="badge">${o.tip}</div>
+      <div>
+        <h4>${o.naziv}</h4>
+        ${renderStars(o.rating)}
+        <p>${o.adresa} • Tel: ${o.tel}</p>
+      </div>
+      <div class="cta">
+       <button class="ghost" onclick="window.open('${o.link}', '_blank')">Više</button>
+      </div>`;
+    elLista.appendChild(row);
+
+    // Klik na karticu → fokus na marker
+    row.addEventListener('click', () => {
+      const marker = markerMap.get(o.id);
+      if (marker) {
+        // Otvori globalni InfoWindow
+        // 1. Kreiraj infoWindow samo jednom
+const infoWindow = new google.maps.InfoWindow();
+
+// 2. Kad stvaraš marker, ubaci plavi box u content
+markers.push(new google.maps.Marker({
+  position: { lat: o.lat, lng: o.lng },
+  map: map,
+  title: o.naziv,
+}));
+
+markers[markers.length - 1].addListener("click", () => {
+  infoWindow.setContent(`
+    <div class="custom-infowindow">
+      <b>${o.naziv}</b><br>
+      ${o.adresa}
+    </div>
+  `);
+  infoWindow.open(map, markers[markers.length - 1]);
+});
+
+
+        // Centriraj mapu i zoom
+        map.setCenter(marker.getPosition());
+        map.setZoom(15);
+
+        // Bounce efekat markera
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => marker.setAnimation(null), 700); // prestani nakon 700ms
+      }
+
+      // Highlight kartice
+      document.querySelectorAll('.item').forEach(it => it.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)');
+      row.style.boxShadow = '0 0 0 3px var(--primary)';
+    });
+  });
+}
+
+// Dodavanje markera sa povezivanjem na kartice
+let infoWindow = new google.maps.InfoWindow(); // globalni InfoWindow
+let currentMarkers = []; // da pratimo sve markere i uklonimo ih prije dodavanja novih
+
+function addMarkers(list) {
+  const bounds = new google.maps.LatLngBounds();
+  
+  // ukloni stare markere sa mape
+  currentMarkers.forEach(m => m.setMap(null));
+  currentMarkers = [];
+  markerMap.clear();
+
+  list.forEach(o => {
+    if (o.lat && o.lng) {
+      const position = { lat: o.lat, lng: o.lng };
+
+      const marker = new google.maps.Marker({
+        position,
+        map,
+        title: o.naziv,
+        icon: {
+           url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }
+      });
+
+      marker.addListener("click", () => {
+        infoWindow.setContent(`<b>${o.naziv}</b><br>`);
+        infoWindow.open(map, marker);
+
+        // Scroll do kartice
+        const el = document.querySelector(`.item[data-id='${o.id}']`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Highlight kartice
+        document.querySelectorAll('.item').forEach(it => it.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)');
+        if (el) el.style.boxShadow = '0 0 0 3px var(--primary)';
+      });
+
+      markerMap.set(o.id, marker);
+      currentMarkers.push(marker); // dodaj u listu za kasnije brisanje
+      bounds.extend(position);
+    }
+  });
+
+  if (!bounds.isEmpty()) {
+    map.fitBounds(bounds);
+  }
+}
+
+
+// Filtriranje po tipu
+// Nova filter funkcija
+function filter() {
+  const t = elTip.value;      // tip ordinacije
+  const lok = select.value;   // kanton ili grad
+
+  const list = ORD.filter(o => {
+    const matchTip = t ? o.tip === t : true;
+
+    let matchLok = true;
+    if (lok) {
+      const adresa = (o.adresa || "").toLowerCase();
+      const opstina = (o.Municipality || "").toLowerCase();
+
+      // Izvuci poštanski broj (ako postoji, npr. 75270)
+      const regexPostanski = /\b\d{5}\b/;
+      const postanski =
+        (adresa.match(regexPostanski) || opstina.match(regexPostanski) || [""])[0];
+
+      // Ako je izabran KANTON
+      if (gradovi[lok]) {
+        const gradoviKantona = gradovi[lok].map(g => g.toLowerCase());
+
+        matchLok = gradoviKantona.some(g =>
+          adresa.includes(g) ||
+          opstina.includes(g) ||
+          postanski.includes(g)
+        );
+      } 
+      // Ako je izabran GRAD
+      else {
+        const gradIme = lok.replace(/-/g, " ").toLowerCase();
+
+        matchLok =
+          adresa.includes(gradIme) ||
+          opstina.includes(gradIme) ||
+          postanski.includes(gradIme);
+      }
+    }
+
+    return matchTip && matchLok;
+  });
+
+  render(list);
+  addMarkers(list);
+}
+
+
+
+
+// Event listeneri
+elBtn.addEventListener('click', filter);
+elTip.addEventListener('change', filter);
+
+// Statistika
+function updateStats() {
+  const tips = new Set(ORD.map(o => o.tip));
+  statUk.textContent = ORD.length;
+  statTp.textContent = tips.size;
+}
+
+// Postavi godinu u footer
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Animacija brojeva
+const counters = document.querySelectorAll('.num');
+counters.forEach(counter => {
+  const target = +counter.getAttribute('data-target');
+  let current = 0;
+  const duration = 2000;
+  const stepTime = 20;
+  const increment = target / (duration / stepTime);
+  function update() {
+    current += increment;
+    if (current < target) {
+      counter.textContent = Math.floor(current);
+      setTimeout(update, stepTime);
+    } else {
+      counter.textContent = target + "+";
+    }
+  }
+  update();
+});
+
+// Učitavanje JSON-a
+fetch('base.json')
+  .then(res => res.json())
+  .then(data => {
+    ORD = data.map((o, i) => ({
+      id: i + 1,
+      naziv: o.Name || "Nepoznato",
+      adresa: o.Fulladdress || "",
+      tip: o.Categories ? o.Categories.split(",")[0] : "Ostalo",
+      tel: o.Phones || "",
+      rating: o["Average Rating"] || 0,
+      lat: parseFloat(o.Latitude) || null,
+      lng: parseFloat(o.Longitude) || null,
+      link: o.Website || "#" 
+    }));
+    updateStats();
+pickPremium(ORD);   // <- Ovdje odaberemo 3 random premium
+render(ORD);
+addMarkers(ORD);
+
+  })
+  .catch(err => console.error("Greška pri učitavanju JSON-a:", err));
+  function simpleBounce(marker) {
+  const latlng = marker.getLatLng();
+  let i = 0;
+  const interval = setInterval(() => {
+    const offset = (i % 2 === 0 ? 0.0005 : -0.0005);
+    marker.setLatLng([latlng.lat + offset, latlng.lng]);
+    i++;
+    if (i > 5) { // 3 “iskačenja”
+      clearInterval(interval);
+      marker.setLatLng(latlng); // vrati originalnu poziciju
+    }
+  }, 100);
+}
+
+
+
+</script>
+
+
+
+
+
+</body>
+</html>
