@@ -16,7 +16,7 @@ MedConnect is a web application designed to help patients easily find and connec
 The goal of this project is to digitize and modernize access to healthcare services.
 </p>
 
-<img src="pict1.png" alt="MedConnect Screenshot 2" width="600">
+
 
 <h2 style="color:#27AE60; font-size:36px;">Technologies</h2>
 <ul style="font-size:16px; color:#34495E;">
